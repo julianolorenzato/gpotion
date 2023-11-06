@@ -1,4 +1,6 @@
-Mix.install([:nx, :matrex])
+Mix.install([{:exla, "~> 0.2"}, :matrex])
+
+Nx.global_default_backend(EXLA.Backend)
 
 defmodule NxBenchmark.MM do
   import Nx.Defn
