@@ -19,13 +19,13 @@ mat1 =
   Matrex.fill(matrix_size, 1)
   |> Matrex.apply(gen_random)
   |> Matrex.to_list_of_lists()
-  |> Nx.tensor(type: :f64)
+  |> Nx.tensor(type: :f32)
 
 mat2 =
   Matrex.fill(matrix_size, 1)
   |> Matrex.apply(gen_random)
   |> Matrex.to_list_of_lists()
-  |> Nx.tensor(type: :f64)
+  |> Nx.tensor(type: :f32)
 
 
 started = System.monotonic_time()
