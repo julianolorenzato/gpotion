@@ -1,4 +1,4 @@
-Mix.install([{:exla, "~> 0.2"}, :matrex])
+Mix.install([{:exla, "~> 0.6.4"}, :matrex])
 
 Nx.global_default_backend(EXLA.Backend)
 

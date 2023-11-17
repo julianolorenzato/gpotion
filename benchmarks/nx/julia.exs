@@ -1,4 +1,4 @@
-Mix.install([{:exla, "~> 0.6.4"}, :matrex])
+Mix.install([{:exla, "~> 0.6.4"}])
 
 Nx.global_default_backend(EXLA.Backend)
 
@@ -21,7 +21,11 @@ defmodule NxBenchmark.Julia do
     ar = jx
     ai = jy
 
+    n = 200
+    number = 2000
 
+    nar = (ar * ar - ai * ai) + cr
+    nai = (ai * ar - ar * ai) + ci
   end
 end
 
@@ -38,5 +42,8 @@ result = NxBenchmark.Julia.julia(initial_matrix)
 finished = System.monotonic_time()
 
 # print result
-IO.puts "Nx\t#{matrix_size}\t#{System.convert_time_unit(finished-started,:native,:millisecond)} "
+IO.puts(
+  "Nx\t#{matrix_size}\t#{System.convert_time_unit(finished - started, :native, :millisecond)} "
+)
+
 IO.inspect(result)
