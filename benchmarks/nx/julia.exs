@@ -1,6 +1,6 @@
 Mix.install([{:exla, "~> 0.6.4"}])
 
-Nx.global_default_backend(EXLA.Backend)
+# Nx.global_default_backend(EXLA.Backend)
 
 defmodule NxBenchmark.Julia do
   import Nx.Defn
@@ -10,23 +10,25 @@ defmodule NxBenchmark.Julia do
 
     scale = 0.1
 
-    indexes_x = Nx.iota({dim, dim}, axis: 0, type: :f32, names: [:x, :y])
-    indexes_y = Nx.iota({dim, dim}, axis: 1, type: :f32, names: [:x, :y])
+    # indexes_x = Nx.iota({dim, dim}, axis: 0, type: :f32, names: [:x, :y])
+    # indexes_y = Nx.iota({dim, dim}, axis: 1, type: :f32, names: [:x, :y])
 
-    jx = scale * (dim - indexes_x) / dim
-    jy = scale * (dim - indexes_y) / dim
+    # jx = scale * (dim - indexes_x) / dim
+    # jy = scale * (dim - indexes_y) / dim
 
     j = scale * (dim - indexes) / dim
 
-    cr = -0.8
-    ci = 0.156
-    ar = jx
-    ai = jy
+    # cr = -0.8
+    # ci = 0.156
+    # ar = jx
+    # ai = jy
 
-    n = 200
+    # n = 200
 
     # nar = (ar * ar - ai * ai) + cr
     # nai = (ai * ar - ar * ai) + ci
+
+    while_julia(Nx.vectorize(j, [:rows, :cols]))
   end
 
   defn while_julia(arai) do
@@ -35,24 +37,29 @@ defmodule NxBenchmark.Julia do
       _ -> raise "invalid shape"
     end
 
-    {x, y} = Nx.split(arai, 1)
+    # case Nx.type(arai) do
+    #   {:f, 32} -> :ok
+    #   _ -> raise "invalid type"
+    # end
 
-    ar = Nx.squeeze(x)
-    ai = Nx.squeeze(y)
+    ar = arai[0]
+    ai = arai[1]
 
     cr = -0.8
     ci = 0.156
 
-    while {ar, ai, n = 200}, n != 0 do
-      nar = ar * ar - ai * ai + cr
-      nai = ai * ar + ar * ai + ci
-      {nar, nai, n-1}
-    end
+    {_, _, n, _, _} =
+      while {ar, ai, n = Nx.tensor(200, type: :f32), cr, ci},
+            n != 0 or ar * ar + ai * ai > 1000 do
+        nar = ar * ar - ai * ai + cr
+        nai = ai * ar + ar * ai + ci
+        {nar, nai, n - 1, cr, ci}
+      end
 
-    if nar * nar + nai * nai > 1000 do
-      Nx.tensor(0)
-    else
+    if n == 0 do
       Nx.tensor(1)
+    else
+      Nx.tensor(0)
     end
   end
 
@@ -93,7 +100,7 @@ dim = String.to_integer(dim)
 # empty matrix setup
 initial_pixel = Nx.tensor([0, 0, 0, 255], type: :f32)
 initial_matrix = Nx.broadcast(initial_pixel, {dim, dim, 4}, names: [:x, :y, :pixel])
-indexes = Nx.tensor(NxBenchmark.Julia.square_matrix(dim))
+indexes = Nx.tensor(NxBenchmark.Julia.square_matrix(dim), type: :f32)
 
 # run benchmark
 started = System.monotonic_time()
