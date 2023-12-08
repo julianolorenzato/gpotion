@@ -7,6 +7,7 @@ defmodule NxBenchmark.Julia do
 
   defn julia(matrix, indexes) do
     {dim, _, _} = Nx.shape(matrix)
+    matrix = Nx.vectorize(matrix, [:rows, :cols])
 
     scale = 0.1
 
@@ -14,7 +15,10 @@ defmodule NxBenchmark.Julia do
 
     arai = Nx.vectorize(j, [:rows, :cols])
 
-    bool = while_julia(arai)
+    color = while_julia(arai) * 255
+
+    Nx.concatenate([color, matrix])
+    |> Nx.devectorize()
   end
 
   defn while_julia(arai) do
@@ -53,21 +57,12 @@ defmodule NxBenchmark.Julia do
   end
 end
 
-# j = Nx.divide(Nx.multiply(0.1, Nx.subtract(4, xy)), 4)
-
-# Criar matrix dim*dim*2 de índices (x, y)
-# usar os índices para calcular os valores e transformar a matriz em uma matriz de booleanos, 1 ou 0
-# usar os booleanos para transformar a matriz em uma matriz de pixels [0, 0, 0, 255] ou [255, 0, 0, 255]
-
-# para criar matriz de índices ficar de olho nas funções: iota, broadcast, concatenate, stack, tile, reshape
-# x = iota axis 0, y = iota axis 1, stack x,y, reshape {3, 3, 2} (((QUASE)))
-
 [dim] = System.argv()
 dim = String.to_integer(dim)
 
 # empty matrix setup
-initial_pixel = Nx.tensor([255, 0, 0, 255], type: :f32)
-initial_matrix = Nx.broadcast(initial_pixel, {dim, dim, 4}, names: [:x, :y, :pixel])
+initial_pixel = Nx.tensor([0, 0, 255], type: :f32)
+initial_matrix = Nx.broadcast(initial_pixel, {dim, dim, 3}, names: [:x, :y, :pixel])
 indexes = Nx.tensor(NxBenchmark.Julia.square_matrix(dim), type: :f32)
 
 # run benchmark
