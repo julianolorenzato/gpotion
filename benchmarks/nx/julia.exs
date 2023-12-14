@@ -72,4 +72,4 @@ finished = System.monotonic_time()
 # print result
 IO.puts("Nx\t#{dim}\t#{System.convert_time_unit(finished - started, :native, :millisecond)} ")
 
-IO.inspect(result, limit: 1000)
+# IO.inspect(result, limit: 1000)
