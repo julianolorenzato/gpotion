@@ -1,6 +1,6 @@
 Mix.install([{:exla, "~> 0.6.4"}])
 
-# Nx.global_default_backend(EXLA.Backend)
+Nx.global_default_backend(EXLA.Backend)
 
 defmodule NxBenchmark.Julia do
   import Nx.Defn
